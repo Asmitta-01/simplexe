@@ -1,6 +1,7 @@
 #include "Simplexe.hpp"
 
 #include <algorithm>
+#include <cmath>
 
 Simplexe::Simplexe(Matrice const &f, Matrice const &m)
     : s_fonction(f), s_matrice(m)
@@ -207,7 +208,7 @@ std::size_t indice_du_max(std::vector<double> const &lth)
     std::size_t index{0};
     for (std::size_t i = 0; i < lth.size(); i++)
     {
-        if (lth[index] < lth[i])
+        if (std::isfinite(lth[i]) && lth[index] < lth[i])
             index = i;
     }
     return index;
@@ -217,7 +218,7 @@ std::size_t indice_du_min(std::vector<double> const &lth)
     std::size_t index{0};
     for (std::size_t i = 0; i < lth.size(); i++)
     {
-        if (lth[index] > lth[i])
+        if (std::isfinite(lth[i]) && lth[index] > lth[i])
             index = i;
     }
     return index; // return index_du_max(-lth);
@@ -265,7 +266,7 @@ std::vector<double> operator/(std::vector<double> const &vecteur_a, std::vector<
     std::vector<double> vecteur_c;
     for (int i = 0; i < vecteur_a.size(); i++)
     {
-        assert(vecteur_b[i] != 0 && "Division impossible avec un denominateur nul");
+        // assert(vecteur_b[i] != 0 && "Division impossible avec un denominateur nul");
         vecteur_c.push_back(vecteur_a[i] / vecteur_b[i]);
     }
     return vecteur_c;
@@ -285,35 +286,7 @@ std::ostream &operator<<(std::ostream &stream, Simplexe const &simplexe)
     return stream;
 }
 
-std::ostream &operator<<(std::ostream &stream, std::vector<double> const &vec)
-{
-    stream << "{ ";
-    for (double elt : vec)
-    {
-        std::cout << elt;
-        if (elt == vec.back())
-            std::cout << " }" << std::endl;
-        else
-            std::cout << ", ";
-    }
 
-    return stream;
-}
-
-std::ostream &operator<<(std::ostream &stream, std::vector<std::size_t> const &vec)
-{
-    stream << "{ ";
-    for (auto elt : vec)
-    {
-        std::cout << elt;
-        if (elt == vec.back())
-            std::cout << " }" << std::endl;
-        else
-            std::cout << ", ";
-    }
-
-    return stream;
-}
 
 /////////////////TEST FUNCTION
 void checkSubAdvance()

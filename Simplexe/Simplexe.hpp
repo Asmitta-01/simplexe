@@ -48,9 +48,23 @@ std::size_t indice_du_min(std::vector<double> const &lth);
 bool operator<=(std::vector<double> const &vec, int n);
 bool operator>=(std::vector<double> const &vec, int n);
 bool operator==(std::vector<double> const &vec, int n);
-std::ostream &operator<<(std::ostream &stream, std::vector<double> const &vec);
-std::ostream &operator<<(std::ostream &stream, std::vector<std::size_t> const &vec);
 std::vector<double> operator/(std::vector<double> const &vecteur_a, std::vector<double> const &vecteur_b);
+
+template <typename T>
+std::ostream &operator<<(std::ostream &stream, std::vector<T> const &vec)
+{
+    stream << "{ ";
+    for (auto elt : vec)
+    {
+        std::cout << elt;
+        if (elt == vec.back())
+            std::cout << " }" << std::endl;
+        else
+            std::cout << ", ";
+    }
+
+    return stream;
+}
 
 /**
  * TEST FUNCTION......
