@@ -68,36 +68,27 @@ public:
     int nb_colonnes() const;
 
     /**
+     * @brief Renvoie une matrice issue de la matrice de depart avec uniquement les colonnes recues en parametre
+     *
+     * @return Matrice
+     */
+    Matrice get_colonnes(std::vector<std::size_t>) const;
+
+    /**
      * @brief Supprime la ligne i et la colonne j de la matrice et renvoie la nouvelle matrice obtenue
      *
      * @return Matrice
      */
     Matrice sans_ligne_et_colonne(int i, int j) const;
 
-    /**
-     * @brief Calcul le determinant d'une matrice carree
-     *
-     * @return double
-     */
     double determinant() const;
-
-    /**
-     * @brief Retourne la transposee de la matrice
-     *
-     * @return Matrice
-     */
     Matrice transposee() const;
-
-    /**
-     * @brief Retourne la matrice inverse de celle-ci (this)
-     *
-     * @return Matrice
-     */
     Matrice inverse() const;
 
     friend Matrice operator+(Matrice const &matrice_a, Matrice const &matrice_b);
     friend Matrice operator-(Matrice const &matrice_a, Matrice const &matrice_b);
     friend Matrice operator*(Matrice const &matrice_a, Matrice const &matrice_b);
+    friend bool operator==(Matrice const &matrice_a, Matrice const &matrice_b);
     friend std::vector<double> operator*(Matrice const &matrice, std::vector<double> const &vecteur);
     friend std::vector<double> operator*(std::vector<double> const &vecteur, Matrice const &matrice);
     friend Matrice operator*(double const &, Matrice const &);

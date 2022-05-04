@@ -99,6 +99,16 @@ int Matrice::nb_colonnes() const
     return this->m_nb_colonnes;
 }
 
+Matrice Matrice::get_colonnes(std::vector<std::size_t> base) const
+{
+    assert(base.size() == m_nb_lignes && "La matrice de base doit etre une matrice carree.");
+    std::vector<std::vector<double>> M;
+    for (auto i : base)
+        M.push_back(get_colonne(i));
+
+    return Matrice(M).transposee();
+}
+
 Matrice Matrice::sans_ligne_et_colonne(int ligne, int colonne) const
 {
     assert(ligne < m_nb_lignes && colonne < m_nb_colonnes && "Hors des limites de la matrice");
@@ -207,7 +217,25 @@ Matrice operator*(Matrice const &matrice_a, Matrice const &matrice_b)
     return matrice_c;
 }
 
-std::vector<double> operator*(Matrice const &matrice, std::vector<double> const &vecteur)
+bool operator==(Matrice const &matrice_a, Matrice const &matrice_b)
+{
+    assert(matrice_a.m_nb_colonnes == matrice_b.m_nb_colonnes &&
+           matrice_a.m_nb_lignes == matrice_b.m_nb_lignes &&
+           "L'egalite entre matrice se fait entre matrices de meme dimensions");
+
+    for (std::size_t i = 0; i < matrice_a.m_nb_lignes; i++)
+    {
+        for (std::size_t j = 0; j < matrice_a.m_nb_colonnes; j++)
+        {
+            if (matrice_a.m_matrice[i][j] != matrice_b.m_matrice[i][j])
+                return false;
+        }
+    }
+    return true;
+}
+
+std::vector<double>
+operator*(Matrice const &matrice, std::vector<double> const &vecteur)
 {
     Matrice matrice_v(std::vector<std::vector<double>>(1, vecteur));
     return (matrice * matrice_v.transposee()).transposee().get_ligne(0);

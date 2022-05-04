@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <cassert>
+#include <cstdlib>
 #include <cctype>
 #include <cstring>
 #include <sstream>
@@ -56,6 +57,12 @@ void Fonction::add_at(std::size_t pos, double valeur)
     f_coefficients.at(pos) += valeur;
 }
 
+void Fonction::delete_at(std::size_t pos)
+{
+    assert(pos < f_coefficients.size() && "Acces impossible, indice plus grand que la taille du tableau");
+    // f_coefficients.
+}
+
 std::vector<double> Fonction::get_coefficients() const
 {
     return f_coefficients;
@@ -88,7 +95,8 @@ std::string Fonction::to_string() const
     }
     if (f_variable_b != 0)
         signe = f_variable_b < 0 ? " - " : " + ";
-    return f_variable_b != 0 ? str + signe + dtos(std::abs(f_variable_b)) : str;
+    return f_variable_b != 0 ? str + signe + dtos(std::abs(f_variable_b)) : str.empty() ? dtos(f_variable_b)
+                                                                                        : str;
 }
 
 /////////////////////////////////////////////////////////////////////////

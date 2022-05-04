@@ -25,6 +25,7 @@ public:
     Fonction &operator=(Fonction const &fonction) = default;
 
     void add_at(std::size_t pos, double valeur); // pos est l'indice, cet indice commencant a 0
+    void delete_at(std::size_t pos);
     std::vector<double> get_coefficients() const;
     std::size_t get_index_premier_element() const;
     std::string to_string() const;
