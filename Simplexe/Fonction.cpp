@@ -63,6 +63,17 @@ void Fonction::delete_at(std::size_t pos)
     // f_coefficients.
 }
 
+void Fonction::resize(std::size_t sz)
+{
+    assert(sz >= f_coefficients.size() && "Impossible de reduire la fonction. Utiliser plutot Fonction::delete_at() pour un element precis");
+    f_coefficients.resize(sz);
+}
+
+double Fonction::get_variable_b() const
+{
+    return f_variable_b;
+}
+
 std::vector<double> Fonction::get_coefficients() const
 {
     return f_coefficients;

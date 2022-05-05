@@ -26,6 +26,8 @@ public:
 
     void add_at(std::size_t pos, double valeur); // pos est l'indice, cet indice commencant a 0
     void delete_at(std::size_t pos);
+    void resize(std::size_t); // augmente la taille de la fonction et mets a zero les nouveaux champs
+    double get_variable_b() const;
     std::vector<double> get_coefficients() const;
     std::size_t get_index_premier_element() const;
     std::string to_string() const;

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdlib>
 
 #include "Simplexe.hpp"
 
@@ -14,49 +15,40 @@ void checkAdvance()
 
 int main()
 {
-    std::cout << "--------------------------------------\n"
-              << "Resolution par la methode du simplexe.\n"
-              << "--------------------------------------\n"
-              << "1. La fonction\n"
-              << "C'est un probleme de : \ta. Maximisation\tb. Minimisation ?\n";
+    std::cout << "-----------------------------------------\n"
+              << "| Resolution par la methode du simplexe |\n"
+              << "-----------------------------------------\n"
+              << "C'est un probleme de : \n\ta. Maximisation\tb. Minimisation ?\n";
     char t;
     std::cin >> t;
     bool MAXIMISATION{false};
     if (t == 'a')
         MAXIMISATION = true;
-    int row, col;
-    std::cout << "Nombre de contraintes: ";
-    std::cin >> row;
-    std::cout << "Nombre de variables: ";
-    std::cin >> col;
-    Matrice F(1, col);
-    std::cout << "\nLa fonction est sous forme de matrice. "
-              << "10x1 + 2x2 + 3x4 sous forme matricielle devient: | 10  2  0  3 |\n"
-              << "Entrez la fonction suivant cette logique.\n";
-    std::cin >> F;
-    F.modeMatrice = false;
+    std::cout << "----|\t La fonction\n"
+              << "Entrez clairement votre fonction. Exemple: a1.x1 + a2.x2 + ... ; 2.x1 - 3.x3.\n";
+    std::string fn;
+    std::getline(std::cin >> std::ws, fn);
+    Fonction F(fn);
     std::cout << "Fonction: " << F << std::endl;
 
-    std::cout << "2. La matrice.\n";
-    Matrice M(row, col);
-    std::cin >> M;
-    std::cout << "Matrice: \n"
-              << M << std::endl;
+    std::cout << "----|\t Les contraintes\n"
+              << "Entrez successivement les contraintes du probleme et rien du tout pour terminer la saisie.\n"
+              << "Exemple: a1.x1 + a2.x2 <= b." << std::endl;
+    std::vector<EqLin> eqs;
+    while (std::getline(std::cin, fn) && !fn.empty())
+    {
+        eqs.push_back(EqLin(fn));
+    }
+    Systeme sys(eqs);
+    std::cout << "Systeme: \n"
+              << sys << std::endl;
 
-    Simplexe S(F, M);
-
-    std::cout << "3. Le second membre de la matrice , ou encore b\n"
-              << "L'ensemble des valeurs apres l'egalite dans le systeme\n"
-              << "Exemple: 10x1 + 12x2 = b...\n\n"
-              << "Veuillez entrer les differents champs de ce 'vecteur':\n";
-    S.set_second_membre();
+    Simplexe S(F, sys);
     std::cout << S << std::endl;
 
-    // Phase 2 du simplexe.....................................................
-    // ........................................................................
-    // ........................................................................
     S.set_base();
 
+    // .................................Phase 2 du simplexe....................................... //
     bool OPTIMAL{false};
     do
     {
@@ -76,5 +68,6 @@ int main()
     } while (!OPTIMAL);
     S.show_resultat_final();
 
+    getchar();
     return 0;
 }

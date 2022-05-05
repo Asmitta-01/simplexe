@@ -3,19 +3,19 @@
 #include <algorithm>
 #include <cmath>
 
-Simplexe::Simplexe(Matrice const &f, Matrice const &m)
-    : s_fonction(f), s_matrice(m)
+Simplexe::Simplexe(Fonction const &f, Systeme s)
+    : s_fonction(f), s_systeme(s), s_matrice(s.version_standard().get_matrice()), s_second_membre(s.get_second_membre())
 {
-    assert(!s_fonction.est_vide() && !s_matrice.est_vide() && "La fonction ou la matrice ne peut etre vide.");
-    assert(s_matrice.m_matrice_simple == false && "Le simplexe doit recevoir une matrice respectant les restrictions.");
+    assert(!s_fonction.get_coefficients().empty() && !s_matrice.est_vide() && "La fonction ou le systeme de contraintes ne peut etre vide.");
+    s_fonction.resize(s_matrice.nb_colonnes());
 }
 
 std::vector<double> Simplexe::vecteur_de_cout_reduit() const
 {
-    Matrice cth = Matrice(get_matrice_hors_base(false), true);
-    Matrice ctb = Matrice(get_matrice_de_base(false), true);
+    Matrice cth = Matrice(get_matrice_hors_base(false));
+    Matrice ctb = Matrice(get_matrice_de_base(false));
     Matrice ab = Matrice(get_matrice_de_base());
-    Matrice ah = Matrice(get_matrice_hors_base(), true);
+    Matrice ah = Matrice(get_matrice_hors_base());
 
     Matrice lth = cth - ctb * ab.inverse() * ah;
     return lth.m_matrice[0];
@@ -37,37 +37,33 @@ void Simplexe::set_second_membre(std::vector<double> vec)
     s_second_membre = vec;
 }
 
-void Simplexe::set_second_membre()
-{
-    double x;
-    std::vector<double> vec;
-    for (int i = 0; i < s_matrice.nb_lignes(); i++)
-    {
-        std::cout << "Champ " << i << " : ";
-        std::cin >> x;
-        vec.push_back(x);
-    }
-    s_second_membre = vec;
-}
-
 void Simplexe::set_base(std::vector<::size_t> b)
 {
     s_base = b;
+    std::cout << "Base de depart: " << s_base << std::endl;
     update_hors_base();
     update_solution_de_base_realisable();
 }
 
 void Simplexe::set_base()
 {
-    std::size_t x;
-    std::vector<std::size_t> vec;
-    for (int i = 0; i < s_matrice.nb_lignes(); i++)
+    bool set = false;
+    std::vector<std::vector<std::size_t>> toutes_les_bases;
+    combinaisons_possibles(toutes_les_bases, s_matrice.m_nb_colonnes, s_matrice.m_nb_lignes);
+    for (auto une_base : toutes_les_bases)
     {
-        std::cout << "Champ " << i << " : ";
-        std::cin >> x;
-        vec.push_back(x);
+        Matrice m{s_matrice.get_colonnes(une_base)};
+        if (m.determinant() != 0)
+        // if (m == m.transposee() && m.determinant() == 1)
+        {
+            set_base(une_base);
+            set = true;
+            break;
+        }
     }
-    set_base(vec);
+
+    if (!set)
+        assert("Probleme mal defini ou necessitant des variables artificielles");
 }
 
 void Simplexe::update_hors_base()
@@ -85,7 +81,7 @@ void Simplexe::update_hors_base()
 
 void Simplexe::update_solution_de_base_realisable()
 {
-    std::vector<double> temp_vec(s_matrice.m_nb_colonnes, 0);
+    std::vector<double> temp_vec(s_matrice.nb_colonnes(), 0);
     for (std::size_t i = 0; i < s_base.size(); i++)
         temp_vec[s_base[i]] = get_solution_de_base()[i];
 
@@ -107,11 +103,10 @@ void Simplexe::update_base(std::size_t x_entrant, std::size_t x_sortant)
 
 void Simplexe::show_resultat_final()
 {
-    s_fonction.modeMatrice = false;
     std::cout << "\n---------------------------\n"
               << "Resultat final\n"
               << "---------------------------\n"
-              << "Fonction economique : " << s_fonction << " = " << s_fonction * get_solution_de_base_realisable()
+              << "Fonction economique : " << s_fonction << " = " << Matrice(s_fonction.get_coefficients()) * get_solution_de_base_realisable()
               << "Base finale: " << s_base
               << "Solution de base optimale: " << get_solution_de_base_realisable() << std::endl;
 }
@@ -137,11 +132,12 @@ std::vector<double> Simplexe::get_solution_de_base() const
 
 std::vector<double> Simplexe::get_solution_hors_base() const
 {
+    Matrice M(s_fonction.get_coefficients());
     std::vector<double> l_mhb;
-    for (int j = 0; j < s_fonction.nb_colonnes(); j++)
+    for (int j = 0; j < M.nb_colonnes(); j++)
     {
         if (s_sln_de_base_realisable[j] == 0)
-            l_mhb.push_back(s_fonction.get_ligne(0)[j]);
+            l_mhb.push_back(M.get_ligne(0)[j]);
     }
     return l_mhb;
 }
@@ -151,7 +147,7 @@ std::vector<std::vector<double>> Simplexe::get_matrice_hors_base(bool matrice) c
     assert(!s_sln_de_base_realisable.empty() && "Aucune Base n'a ete ajoutee. Impossible d'avoir la base");
 
     std::vector<std::vector<double>> mhb;
-    Matrice ap = matrice ? s_matrice : s_fonction;
+    Matrice ap = matrice ? s_matrice : Matrice(s_fonction.get_coefficients());
 
     for (int i = 0; i < ap.nb_lignes(); i++)
     {
@@ -170,11 +166,11 @@ std::vector<std::vector<double>> Simplexe::get_matrice_de_base(bool matrice) con
 {
     assert(!s_base.empty() && "Aucune Base n'a ete ajoutee. Impossible d'avoir la base");
     std::vector<std::vector<double>> mhb;
-    Matrice ap = matrice ? s_matrice : s_fonction;
+    Matrice ap = matrice ? s_matrice : Matrice(s_fonction.get_coefficients());
     for (int j = 0; j < s_base.size(); j++)
         mhb.push_back(ap.get_colonne(s_base[j]));
 
-    return Matrice(mhb, true).transposee().m_matrice;
+    return Matrice(mhb).transposee().m_matrice;
 }
 
 std::size_t Simplexe::get_variable_entrante(bool MAX_FUNCTION) const
@@ -274,21 +270,63 @@ std::vector<double> operator/(std::vector<double> const &vecteur_a, std::vector<
 
 std::ostream &operator<<(std::ostream &stream, Simplexe const &simplexe)
 {
-    stream << "Simplexe\n"
+    stream << "----|\tSimplexe\n"
            << "-------------------------\n"
-           << "Fonction : "
+           << "----|\tFonction : "
            << simplexe.s_fonction << std::endl
-           << "Matrice associee: \n"
+           << "----|\tMatrice associee: \n"
            << simplexe.s_matrice << std::endl
-           << "Systeme final : \n"
-           << "---Pas encore dispo---" << std::endl;
+           << "----|\tSysteme : \n"
+           << simplexe.s_systeme << std::endl;
 
     return stream;
 }
 
+////////////////////////////////////////////////////
 
+// @PierrotLeFou - OpenClassrooms
+// void combinaisons_possibles(std::vector<std::vector<std::size_t>> &combinaisons, int v_max, int taille)
+// {
+//     std::vector<std::size_t> passe(taille);
+//     int i = 0;
+//     int v = 0;
+//     while (i >= 0)
+//     {
+//         while (i < taille && v + taille - i <= v_max)
+//         {
+//             passe[i++] = v++;
+//         }
+//         if (i == taille)
+//             combinaisons.push_back(passe);
+//         i--;
+//         if (i >= 0)
+//             v = passe[i] + 1;
+//     }
+// }
 
-/////////////////TEST FUNCTION
+void combinaisons_possibles(std::vector<std::vector<std::size_t>> &combinaisons, std::size_t const v_max, std::size_t const taille, std::vector<std::size_t> vecteur, std::size_t pos)
+{
+    assert(v_max > 1 && taille > 0 && "Combinaison, probleme.");
+    if (vecteur.size() == 0)
+        vecteur.resize(taille);
+
+    // std::vector<std::vector<std::size_t>> combinaisons;
+    for (std::size_t i = 0; i < v_max; i++)
+    {
+        if (pos == 0 || i > vecteur[pos - 1])
+        {
+            vecteur[pos] = i;
+            if (taille == 1)
+                combinaisons.push_back(vecteur);
+            else
+                combinaisons_possibles(combinaisons, v_max, taille - 1, vecteur, pos + 1);
+        }
+    }
+
+    // return combinaisons;
+}
+
+///////////////// TEST FUNCTION ////////////////////////
 void checkSubAdvance()
 {
     std::cout << "\nReached sub-step " << sub_step << std::endl;

@@ -17,21 +17,14 @@ class Matrice
 private:
     int m_nb_lignes;
     int m_nb_colonnes;
-    bool m_matrice_simple; // False signifie que cette matrice n'est pas simple: Elle doit respecter les normes d'ne matrice de Simplexe
     std::vector<std::vector<double>> m_matrice;
 
 public:
-    Matrice(int, int, bool m_s = false);
-    Matrice(std::vector<std::vector<double>> const &, bool m_s = false);
+    Matrice(int, int);
+    Matrice(std::vector<double> const &);
+    Matrice(std::vector<std::vector<double>> const &);
     Matrice(Matrice const &matrice) = default;
     Matrice &operator=(Matrice const &matrice) = default;
-
-    /**
-     * @brief Definit le mode d'affichage, a true l'affichage est sous forme de matrice.
-     * A false c'est sous forme de systeme.
-     *
-     */
-    bool modeMatrice = true;
 
     /**
      * @brief Renvoie un booleen determinant l'etat de la matrice.

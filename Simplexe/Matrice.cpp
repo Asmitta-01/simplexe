@@ -3,20 +3,23 @@
 #include <cassert>
 #include <cmath>
 
-Matrice::Matrice(int l, int c, bool m)
-    : m_nb_lignes(l), m_nb_colonnes(c), m_matrice(l, std::vector<double>(c)), m_matrice_simple(m)
+Matrice::Matrice(int l, int c)
+    : m_nb_lignes(l), m_nb_colonnes(c), m_matrice(l, std::vector<double>(c))
 {
     assert(m_nb_colonnes > 0 && m_nb_lignes > 0 && "On ne peut avoir une matrice avec une dimension nulle.");
-    if (!m_matrice_simple)
-        assert(m_nb_colonnes >= m_nb_lignes && "Le nombre de contraintes doit etre inferieur au nombre de variables.");
 }
 
-Matrice::Matrice(std::vector<std::vector<double>> const &vec, bool m)
-    : m_nb_lignes(vec.size()), m_nb_colonnes(vec[0].size()), m_matrice(vec), m_matrice_simple(m)
+Matrice::Matrice(std::vector<double> const &vec)
+    : m_nb_lignes(1), m_nb_colonnes(vec.size()), m_matrice(1, std::vector<double>{vec})
 {
     assert(m_nb_colonnes > 0 && m_nb_lignes > 0 && "On ne peut avoir une matrice avec une dimension nulle.");
-    if (!m_matrice_simple)
-        assert(m_nb_colonnes >= m_nb_lignes && "Le nombre de contraintes doit etre inferieur au nombre de variables.");
+}
+
+Matrice::Matrice(std::vector<std::vector<double>> const &vec)
+    : m_nb_lignes(vec.size()), m_nb_colonnes(vec[0].size()), m_matrice(vec)
+{
+    assert(m_nb_colonnes > 0 && m_nb_lignes > 0 && "On ne peut avoir une matrice avec une dimension nulle.");
+    // assert(m_nb_colonnes >= m_nb_lignes && "Le nombre de contraintes doit etre inferieur au nombre de variables.");
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -144,7 +147,7 @@ double Matrice::determinant() const
 
 Matrice Matrice::transposee() const
 {
-    Matrice matrice_t(m_nb_colonnes, m_nb_lignes, true);
+    Matrice matrice_t(m_nb_colonnes, m_nb_lignes);
     matrice_t.m_matrice.erase(std::begin(matrice_t.m_matrice), std::end(matrice_t.m_matrice));
     for (int i = 0; i < m_nb_colonnes; i++)
     {
@@ -200,7 +203,7 @@ Matrice operator*(Matrice const &matrice_a, Matrice const &matrice_b)
 {
     assert(matrice_a.nb_colonnes() == matrice_b.nb_lignes() &&
            "Multiplication impossible. Les dimensions correspondent pas.");
-    Matrice matrice_c(matrice_a.nb_lignes(), matrice_b.nb_colonnes(), true);
+    Matrice matrice_c(matrice_a.nb_lignes(), matrice_b.nb_colonnes());
     if (matrice_a.est_nulle() || matrice_b.est_nulle())
         return matrice_c;
 
@@ -268,36 +271,15 @@ Matrice operator*(double const &n, Matrice const &matrice)
 
 std::ostream &operator<<(std::ostream &stream, Matrice const &matrice)
 {
-    if (matrice.modeMatrice)
+    for (int i = 0; i < matrice.nb_lignes(); i++)
     {
-        for (int i = 0; i < matrice.nb_lignes(); i++)
+        for (double elt : matrice.get_ligne(i))
         {
-            for (double elt : matrice.get_ligne(i))
-            {
-                stream << elt << "\t";
-            }
-            stream << "\n";
+            stream << elt << "\t";
         }
+        stream << "\n";
     }
-    else
-    {
-        for (int i{0}; i < matrice.nb_lignes(); i++)
-        {
-            int k{1};
-            for (double &elt : matrice.get_ligne(i))
-            {
-                if (elt != 0)
-                {
-                    stream << elt << ".x" << k;
-                    if (k != matrice.nb_colonnes() && *(&elt + 1) != 0)
-                        std::cout << " + ";
-                }
-                k++;
-            }
-            if (i + 1 < matrice.nb_lignes())
-                stream << "\n";
-        }
-    }
+
     return stream;
 }
 std::istream &operator>>(std::istream &stream, Matrice &matrice)
