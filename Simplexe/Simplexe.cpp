@@ -53,8 +53,8 @@ void Simplexe::set_base()
     for (auto une_base : toutes_les_bases)
     {
         Matrice m{s_matrice.get_colonnes(une_base)};
-        if (m.determinant() != 0)
-        // if (m == m.transposee() && m.determinant() == 1)
+        // if (m.determinant() != 0)
+        if (m == m.transposee() && m.determinant() == 1)
         {
             set_base(une_base);
             set = true;
@@ -62,8 +62,7 @@ void Simplexe::set_base()
         }
     }
 
-    if (!set)
-        assert("Probleme mal defini ou necessitant des variables artificielles");
+    assert(set && "Probleme mal defini ou necessitant des variables artificielles");
 }
 
 void Simplexe::update_hors_base()

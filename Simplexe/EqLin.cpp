@@ -13,6 +13,7 @@ EqLin::EqLin(std::string str)
     f2 = parts.back();
     op = parts.at(0).back();
     op.push_back('=');
+    op = op == " =" ? "=" : op;
     parts.at(0).pop_back();
     f1 = parts.at(0);
 

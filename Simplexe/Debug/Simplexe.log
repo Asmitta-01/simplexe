@@ -1,5 +1,0 @@
-﻿  main.cpp
-C:\Users\tiwab\Documents\cpp_projects\Simplexe\Simplexe\Simplexe.hpp(63,23): warning C4018: '<' : incompatibilité signed/unsigned
-C:\Users\tiwab\Documents\cpp_projects\Simplexe\Simplexe\Simplexe.hpp(73,23): warning C4018: '<' : incompatibilité signed/unsigned
-C:\Users\tiwab\Documents\cpp_projects\Simplexe\Simplexe\Simplexe.hpp(101,23): warning C4018: '<' : incompatibilité signed/unsigned
-  Simplexe.vcxproj -> C:\Users\tiwab\Documents\cpp_projects\Simplexe\Debug\Simplexe.exe

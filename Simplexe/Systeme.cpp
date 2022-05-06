@@ -73,8 +73,8 @@ Systeme Systeme::version_standard() const
             int val = eq.op == "<=" ? 1 : -1;
             eq.add_at(i, val);
             eq.set_operateur("=");
+            i++;
         }
-        i++;
     }
     for (auto &eq : s.s_system)
         eq.f1.resize(i);
