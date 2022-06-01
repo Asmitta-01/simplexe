@@ -44,9 +44,18 @@ std::ostream &operator<<(std::ostream &stream, Fonction const &fn);
 std::vector<double> operator+(std::vector<double> vec_a, std::vector<double> vec_b);
 std::vector<double> operator-(std::vector<double> vec_a, std::vector<double> vec_b);
 std::vector<double> operator*(std::vector<double> const &vecteur, double n);
-std::vector<double> operator*(double n, std::vector<double> const &vecteur);
+std::vector<double> operator+(std::vector<double> const &vecteur, double n);
 
 /////////////////////////////////////////////////////////////////////
+
+template <typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type * = nullptr>
+std::vector<double> operator+(std::vector<T> const &vecteur, double n)
+{
+    std::vector<double> v;
+    for (auto elt : vecteur)
+        v.push_back(elt + n);
+    return v;
+}
 
 std::string dtos(double n); // Double to string
 std::vector<std::string> split(std::string const &, char delimiter = ' ');

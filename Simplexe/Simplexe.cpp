@@ -40,7 +40,7 @@ void Simplexe::set_second_membre(std::vector<double> vec)
 void Simplexe::set_base(std::vector<::size_t> b)
 {
     s_base = b;
-    std::cout << "Base de depart: " << s_base << std::endl;
+    std::cout << "Base de depart: " << s_base + 1 << std::endl;
     update_hors_base();
     update_solution_de_base_realisable();
 }
@@ -62,7 +62,7 @@ void Simplexe::set_base()
         }
     }
 
-    assert(set && "Probleme mal defini ou necessitant des variables artificielles");
+    assert(set && "Probleme mal defini. Tres mal defini meme ! ");
 }
 
 void Simplexe::update_hors_base()
@@ -106,7 +106,7 @@ void Simplexe::show_resultat_final()
               << "Resultat final\n"
               << "---------------------------\n"
               << "Fonction economique : " << s_fonction << " = " << Matrice(s_fonction.get_coefficients()) * get_solution_de_base_realisable()
-              << "Base finale: " << s_base
+              << "Base finale: " << s_base + 1
               << "Solution de base optimale: " << get_solution_de_base_realisable() << std::endl;
 }
 

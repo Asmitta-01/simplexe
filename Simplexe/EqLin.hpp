@@ -3,7 +3,7 @@
 
 #include "Fonction.hpp"
 
-std::string const operateurs{"<=>"};
+std::string const operateurs{"<=>="};
 class Systeme;
 
 /**

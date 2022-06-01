@@ -1,7 +1,7 @@
 #include "Systeme.hpp"
 
 #include <cassert>
-#include <cstdlib>
+#include <algorithm>
 
 Systeme::Systeme(std::vector<EqLin> sys) : s_system(sys)
 {
@@ -19,7 +19,7 @@ std::size_t Systeme::get_nbre_de_variables() const
 {
     std::size_t max{0};
     for (auto eq : s_system)
-        max = __max(eq.get_nombre_de_variables(), max);
+        max = std::max(eq.get_nombre_de_variables(), max);
 
     return max;
 }

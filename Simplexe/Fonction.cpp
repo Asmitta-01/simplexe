@@ -1,11 +1,10 @@
 #include "Fonction.hpp"
 
+#include <algorithm>
 #include <utility>
 #include <cassert>
-#include <cstdlib>
 #include <cctype>
 #include <cstring>
-#include <sstream>
 #include <typeinfo>
 
 Fonction::Fonction() : f_ch_variable('\0'), f_coefficients(std::vector<double>())
@@ -23,7 +22,7 @@ Fonction::Fonction(std::string fn)
     int signe = 1;
     for (auto partie : parties)
     {
-        std::vector<std::string> spl_partie = split(partie, '.');
+        std::vector<std::string> spl_partie = split(partie, '*');
         assert(operators.find(partie) != std::string::npos ||
                std::isdigit(static_cast<unsigned char>(spl_partie.back().back())) &&
                    "String has bad format");
@@ -131,7 +130,7 @@ std::ostream &operator<<(std::ostream &stream, Fonction const &fn)
 
 std::vector<double> operator+(std::vector<double> vec_a, std::vector<double> vec_b)
 {
-    std::size_t max_size = __max(vec_a.size(), vec_b.size());
+    std::size_t max_size = std::max(vec_a.size(), vec_b.size());
     std::vector<double> result(max_size);
     vec_b.resize(max_size);
     vec_a.resize(max_size);
