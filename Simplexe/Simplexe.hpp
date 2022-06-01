@@ -55,10 +55,10 @@ template <typename T>
 std::ostream &operator<<(std::ostream &stream, std::vector<T> const &vec)
 {
     stream << "{ ";
-    for (auto elt : vec)
+    for (auto &elt : vec)
     {
         std::cout << elt;
-        if (elt == vec.back())
+        if (&elt == &vec.back())
             std::cout << " }" << std::endl;
         else
             std::cout << ", ";
